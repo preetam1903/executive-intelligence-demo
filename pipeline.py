@@ -65,7 +65,7 @@ def run_pipeline(uploaded_pdf):
 
     return {
         "pages": pages,
-        "repository": repository
+        "repository": repository,
         "qa_result": qa_result
     }
 
