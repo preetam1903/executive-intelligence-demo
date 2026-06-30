@@ -80,43 +80,50 @@ if uploaded_pdf is not None:
 
     st.subheader("📊 Executive Chart Inventory")
 
-    for chart in result["repository"]["charts"]:
+    charts = result["repository"]["charts"]
 
-        with st.container(border=True):
+    chart_options = {
+        f"{chart['chart_id']} - {chart['chart_title']}": chart
+        for chart in charts
+    }
 
-            c1, c2 = st.columns([1, 4])
+    selected_chart_name = st.selectbox(
+        "Select Executive Chart",
+        list(chart_options.keys())
+    )
 
-            with c1:
+    selected_chart = chart_options[selected_chart_name]
 
-                st.markdown(f"### {chart['chart_id']}")
+    st.divider()
 
-            with c2:
+# ======================================================
+# Selected Chart
+# ======================================================
 
-                st.markdown(
-                    f"**{chart['chart_title']}**"
-                )
+    st.subheader("📈 Selected Chart")
 
-                st.write(
-                    f"📄 Page : {chart['page_number']}"
-                )
+    # Show image if available
+    if "image" in selected_chart:
 
-                st.write(
-                    f"📈 Type : {chart['chart_type']}"
-                )
+        st.image(
+            selected_chart["image"],
+            use_container_width=True
+        )
 
-                st.write(
-                    f"🏭 Area : {chart['business_area']}"
-                )
+    col1, col2 = st.columns([1, 2])
 
-                st.write(
-                    chart["summary"]
-                )
+    with col1:
 
-                st.caption(
-                    f"Confidence : {chart['confidence']:.2f}"
-                )
+        st.metric("Chart ID", selected_chart["chart_id"])
+        st.metric("Page", selected_chart["page_number"])
+        st.metric("Type", selected_chart["chart_type"])
 
+    with col2:
 
-    st.subheader("Pipeline Output")
+        st.write(f"**Title** : {selected_chart['chart_title']}")
+        st.write(f"**Business Area** : {selected_chart['business_area']}")
+        st.write(f"**Metric** : {selected_chart['metric']}")
+        st.write(f"**Summary** : {selected_chart['summary']}")
+        st.write(f"**Confidence** : {selected_chart['confidence']:.2f}") 
 
-    st.write(result)
+  

@@ -1,255 +1,70 @@
+"""
+=========================================================
+Executive Intelligence Copilot
+Chart Crop Agent
+=========================================================
+
+Responsibility
+--------------
+Create chart images from the PDF.
+
+Current Version
+---------------
+Saves the entire page as an image.
+
+Future Version
+--------------
+Crop individual charts using grid/layout information.
+"""
+
 import os
-
-from PIL import Image
-import json
-import streamlit as st
-
+import fitz
 
 
 class ChartCropAgent:
 
-    ##############################################################
-    # Constructor
-    ##############################################################
+    def __init__(self, output_folder="output"):
 
-    def __init__(self):
+        self.output_folder = output_folder
 
-        pass
+        os.makedirs(self.output_folder, exist_ok=True)
 
-    ##############################################################
-    # Load Page Image
-    ##############################################################
+    def process(self, uploaded_pdf, charts):
+        """
+        Generate chart images.
 
-    def load_page(
+        Parameters
+        ----------
+        uploaded_pdf : Streamlit UploadedFile
 
-            self,
+        charts : list
 
-            image_path
+        Returns
+        -------
+        list
+        """
 
-    ):
+        pdf_bytes = uploaded_pdf.read()
 
-        image = Image.open(
+        document = fitz.open(stream=pdf_bytes, filetype="pdf")
 
-            image_path
+        for chart in charts:
 
-        )
+            page_number = chart["page_number"] - 1
 
-        image = image.convert(
+            page = document.load_page(page_number)
 
-            "RGB"
+            pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
 
-        )
-
-        return image
-
-        ##############################################################
-    # Crop One Chart
-    ##############################################################
-
-    def crop_chart(
-
-            self,
-
-            page_image,
-            page_template,
-
-            chart,
-
-            output_folder,
-
-            left_ratio=0.12,
-
-            top_ratio=0.15,
-
-            right_ratio=0.12,
-
-            bottom_ratio=0.3
-
-    ):
-
-        width, height = page_image.size
-
-        layout = page_template["layout"]
-
-        grid = chart["grid"]
-
-        row = grid["row"]
-        column = grid["column"]
-
-        cell_width = layout["cell_width"]
-        cell_height = layout["cell_height"]
-
-        usable_top = layout["usable_top"]
-
-        left = int((column - 1) * cell_width)
-        top = int(usable_top + (row - 1) * cell_height)
-
-        right = int(left + cell_width)
-        bottom = int(top + cell_height)
-
-        bbox = {
-            "left": left,
-            "top": top,
-            "right": right,
-            "bottom": bottom
-        }
-
-       ##########################################################
-# Calculate Dynamic Padding
-##########################################################
-
-        left = bbox["left"]
-        top = bbox["top"]
-        right = bbox["right"]
-        bottom = bbox["bottom"]
-
-##########################################################
-# Expand Expected Box
-##########################################################
-
-        left = bbox["left"]
-        top = bbox["top"]
-        right = bbox["right"]
-        bottom = bbox["bottom"]
-        ##########################################################
-        # Crop
-        ##########################################################
-
-        cropped = page_image.crop(
-
-            (
-
-                left,
-
-                top,
-
-                right,
-
-                bottom
-
+            image_path = os.path.join(
+                self.output_folder,
+                f"{chart['chart_id']}.png"
             )
 
-        )
+            pix.save(image_path)
 
-        ##########################################################
-        # Save
-        ##########################################################
+            chart["image"] = image_path
 
-        
-        crop_folder = os.path.join(
+        document.close()
 
-            output_folder,
-
-            "grid_cell_crops"
-
-        )
-
-        os.makedirs(
-
-            crop_folder,
-
-            exist_ok=True
-
-        )
-
-        image_path = os.path.join(
-
-            crop_folder,
-
-            f'{chart["chart_id"]}.png'
-
-        )
-
-        cropped.save(
-
-            image_path
-
-        )
-
-        ##########################################################
-        # Update Chart Metadata
-        ##########################################################
-
-        chart["image"] = image_path
-
-        chart["refined_bbox"] = {
-
-            "left": left,
-
-            "top": top,
-
-            "right": right,
-
-            "bottom": bottom
-
-        }
-
-        chart["crop_width"] = right - left
-
-        chart["crop_height"] = bottom - top
-
-        chart["crop_metadata"] = {
-            "method": "grid_cell_crop_v1"
-        }
-
-        return chart
-
-        ##############################################################
-    # Process All Charts
-    ##############################################################
-
-    def process(
-
-            self,
-
-            page_template,
-
-            output_folder
-
-    ):
-
-        ##########################################################
-        # Load Page
-        ##########################################################
-
-        page_image = self.load_page(
-
-            page_template["page_image"]
-
-        )
-
-        ##########################################################
-        # Crop Every Chart
-        ##########################################################
-
-        updated_charts = []
-
-        for chart in page_template["charts"]:
-
-            updated_chart = self.crop_chart(
-
-                page_image=page_image,
-                page_template=page_template,
-
-                chart=chart,
-
-                output_folder=output_folder
-
-            )
-
-            updated_charts.append(
-
-                updated_chart
-
-            )
-
-        ##########################################################
-        # Update Template
-        ##########################################################
-
-        page_template["charts"] = updated_charts
-
-        st.subheader("Page Template")
-
-        st.json(page_template)
-        return page_template
+        return charts

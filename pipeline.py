@@ -28,6 +28,8 @@ from chart_inventory_agent import ChartInventoryAgent
 from chart_understanding_agent import ChartUnderstandingAgent
 from repository_agent import RepositoryAgent
 from executive_qa_agent import ExecutiveQAAgent
+from chart_crop_agent import ChartCropAgent
+
 
 
 # =========================================================
@@ -48,6 +50,18 @@ def run_pipeline(uploaded_pdf):
     inventory_agent = ChartInventoryAgent()
 
     charts = inventory_agent.process(pages)
+    crop_agent = ChartCropAgent()
+
+    charts = crop_agent.process(
+        uploaded_pdf,
+        charts
+    )
+    crop_agent = ChartCropAgent()
+
+    charts = crop_agent.process(
+        uploaded_pdf,
+        charts
+    )
 
     understanding_agent = ChartUnderstandingAgent()
 
