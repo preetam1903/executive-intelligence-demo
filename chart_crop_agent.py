@@ -44,6 +44,7 @@ class ChartCropAgent:
         list
         """
 
+        uploaded_pdf.seek(0)
         pdf_bytes = uploaded_pdf.read()
 
         document = fitz.open(stream=pdf_bytes, filetype="pdf")
