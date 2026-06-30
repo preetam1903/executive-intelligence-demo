@@ -1,7 +1,7 @@
 import streamlit as st
 
 from pipeline import run_pipeline
-
+from chart_layout_studio import ChartLayoutStudio
 
 # --------------------------------------------------
 # Streamlit Page Configuration
@@ -124,6 +124,11 @@ if uploaded_pdf is not None:
         st.write(f"**Business Area** : {selected_chart['business_area']}")
         st.write(f"**Metric** : {selected_chart['metric']}")
         st.write(f"**Summary** : {selected_chart['summary']}")
-        st.write(f"**Confidence** : {selected_chart['confidence']:.2f}") 
+        st.write(f"**Confidence** : {selected_chart['confidence']:.2f}")
+        layout_studio = ChartLayoutStudio()
+    
+        layout = layout_studio.show(selected_chart)
+
+        st.write(layout)
 
   
