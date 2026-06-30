@@ -24,7 +24,7 @@ Executive Repository
     ↓
 Return Results
 """
-
+from chart_inventory_agent import ChartInventoryAgent
 
 
 # =========================================================
@@ -36,9 +36,15 @@ def run_pipeline(uploaded_pdf):
     Main pipeline executed by app.py
     """
 
-    pages = detect_pages(uploaded_pdf)
+    from page_template_agent import PageTemplateAgent
 
-    charts = detect_charts(pages)
+    page_agent = PageTemplateAgent()
+
+    pages = page_agent.process(uploaded_pdf)
+
+    inventory_agent = ChartInventoryAgent()
+
+    charts = inventory_agent.process(pages)
 
     chart_insights = understand_charts(charts)
 
