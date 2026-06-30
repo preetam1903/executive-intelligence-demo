@@ -25,6 +25,9 @@ Executive Repository
 Return Results
 """
 from chart_inventory_agent import ChartInventoryAgent
+from chart_understanding_agent import ChartUnderstandingAgent
+from repository_agent import RepositoryAgent
+from executive_qa_agent import ExecutiveQAAgent
 
 
 # =========================================================
@@ -46,14 +49,24 @@ def run_pipeline(uploaded_pdf):
 
     charts = inventory_agent.process(pages)
 
-    chart_insights = understand_charts(charts)
+    understanding_agent = ChartUnderstandingAgent()
 
-    repository = build_repository(chart_insights)
+    chart_insights = understanding_agent.process(charts)
+
+    repository_agent = RepositoryAgent()
+
+    repository = repository_agent.process(chart_insights)
+    qa_agent = ExecutiveQAAgent()
+
+    qa_result = qa_agent.process(
+        repository,
+        "Give me summary"
+    )
 
     return {
         "pages": pages,
-        "charts": charts,
         "repository": repository
+        "qa_result": qa_result
     }
 
 

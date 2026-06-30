@@ -1,330 +1,59 @@
-import json
-import base64
+"""
+=========================================================
+Executive Intelligence Copilot
+Chart Understanding Agent
+=========================================================
 
-from openai import OpenAI
+Responsibility
+--------------
+Understand the business meaning of each chart.
+
+Current Version:
+- Placeholder implementation.
+
+Future Version:
+- GPT Vision
+- Chart reasoning
+- Executive summary generation
+"""
 
 
 class ChartUnderstandingAgent:
 
-    def __init__(self, api_key):
+    def __init__(self):
+        pass
 
-        self.client = OpenAI(api_key=api_key)
+    def process(self, charts):
+        """
+        Understand all detected charts.
 
-    ###############################################################
-    # Encode Image
-    ###############################################################
+        Parameters
+        ----------
+        charts : list
 
-    def encode_image(
-            self,
-            image_path
-    ):
+        Returns
+        -------
+        list
+        """
 
-        with open(image_path, "rb") as f:
+        understood_charts = []
 
-            return base64.b64encode(
-                f.read()
-            ).decode("utf-8")
+        for chart in charts:
 
-    ###############################################################
-    # Main Process
-    ###############################################################
+            chart["chart_title"] = f"Executive Chart {chart['chart_id']}"
 
-    def process(
-            self,
-            image_path
-    ):
+            chart["chart_type"] = "Line Chart"
 
-        image64 = self.encode_image(
-            image_path
-        )
+            chart["business_area"] = "Production"
 
-        prompt = self.build_prompt()
+            chart["metric"] = "Production"
 
-        try:
-
-            response = self.client.responses.create(
-
-                model="gpt-4.1-mini",
-
-                input=[
-
-                    {
-
-                        "role": "user",
-
-                        "content": [
-
-                            {
-
-                                "type": "input_text",
-
-                                "text": prompt
-
-                            },
-
-                            {
-
-                                "type": "input_image",
-
-                                "image_url": f"data:image/png;base64,{image64}"
-
-                            }
-
-                        ]
-
-                    }
-
-                ]
-
+            chart["summary"] = (
+                "Production shows a stable trend across the reporting period."
             )
 
-            text = response.output_text.strip()
+            chart["confidence"] = 0.95
 
-        except Exception as e:
+            understood_charts.append(chart)
 
-            return {
-
-                "status": "ERROR",
-
-                "message": str(e)
-
-            }
-
-        print("=" * 80)
-        print("CHART UNDERSTANDING")
-        print("=" * 80)
-        print(text)
-        print("=" * 80)
-
-        understanding = self.clean_json(text)
-
-        understanding["agent"] = "ChartUnderstandingAgent"
-        understanding["version"] = "1.0"
-
-        return understanding
-    ###############################################################
-    # Extract Numerical Series
-    ###############################################################
-
-    def extract_series_values(
-            self,
-            image_path
-    ):
-
-        image64 = self.encode_image(image_path)
-
-        prompt = """
-You are an expert chart digitization engine.
-
-Return ONLY valid JSON.
-
-Read the chart carefully.
-
-Extract ALL numerical values.
-
-Return this format exactly.
-
-{
-    "series":[
-        {
-            "name":"",
-            "values":[]
-        }
-    ]
-}
-
-Rules
-
-1. Read every visible data series.
-
-2. Read every visible numerical value.
-
-3. Estimate values if labels are not printed.
-
-4. Preserve chart order.
-
-5. Return numbers only.
-
-6. No markdown.
-
-7. JSON only.
-"""
-
-        try:
-
-            response = self.client.responses.create(
-
-                model="gpt-4.1-mini",
-
-                input=[
-
-                    {
-
-                        "role":"user",
-
-                        "content":[
-
-                            {
-
-                                "type":"input_text",
-
-                                "text":prompt
-
-                            },
-
-                            {
-
-                                "type":"input_image",
-
-                                "image_url":f"data:image/png;base64,{image64}"
-
-                            }
-
-                        ]
-
-                    }
-
-                ]
-
-            )
-
-            text = response.output_text.strip()
-
-            return self.clean_json(text)
-
-        except Exception as e:
-
-            return {
-
-                "status":"ERROR",
-
-                "message":str(e)
-
-            }
-    ###############################################################
-    # Prompt
-    ###############################################################
-
-    def build_prompt(self):
-
-        return """
-You are an Executive Manufacturing Intelligence Agent.
-
-Analyse this chart completely.
-
-Return ONLY valid JSON.
-
-{
-    "chart_title":"",
-    "chart_type":"",
-    "chart_subtype":"",
-
-    "x_axis":{
-        "type":"",
-        "labels":[]
-    },
-
-    "y_axis":{
-        "title":"",
-        "unit":""
-    },
-
-    "legend":[],
-
-    "series_count":0,
-
-    "summary":"",
-
-    "confidence":0.0
-}
-
-Rules
-
-1. Detect chart title.
-
-2. Detect chart type.
-
-3. Detect chart subtype.
-
-4. Detect X axis type.
-
-5. Read every visible X axis label.
-
-6. Detect Y axis title.
-
-7. Detect Y axis unit.
-
-8. Detect legend names.
-
-9. Count total data series.
-
-10. Write a two-line executive summary.
-
-11. Confidence must be between 0 and 1.
-
-12. Return STRICT JSON ONLY.
-
-Do NOT wrap JSON inside markdown.
-"""
-
-    ###############################################################
-    # Clean JSON
-    ###############################################################
-
-    def clean_json(
-            self,
-            text
-    ):
-
-        try:
-
-            text = text.replace(
-                "```json",
-                ""
-            )
-
-            text = text.replace(
-                "```",
-                ""
-            )
-
-            text = text.strip()
-
-            return json.loads(text)
-
-        except Exception:
-
-            return {
-
-                "status": "ERROR",
-
-                "message": "Unable to parse model response",
-
-                "raw_response": text
-
-            }
-
-    ###############################################################
-    # Save JSON
-    ###############################################################
-
-    def save_json(
-            self,
-            result,
-            output_file
-    ):
-
-        with open(
-            output_file,
-            "w",
-            encoding="utf-8"
-        ) as f:
-
-            json.dump(
-                result,
-                f,
-                indent=4,
-                ensure_ascii=False
-            )
-
-        return output_file
+        return understood_charts
