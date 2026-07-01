@@ -40,6 +40,86 @@ class ChartUnderstandingAgent:
                 image_file.read()
             ).decode("utf-8")
 
+    def understand_page(self, image_path):
+
+        base64_image = self.encode_image(image_path)
+
+        prompt = """
+    You are an Executive Manufacturing Intelligence Agent.
+
+    The image contains an executive dashboard page with multiple charts.
+
+    Identify every chart on the page.
+
+    Return ONLY valid JSON.
+
+    {
+        "charts":[
+            {
+                "chart_id":"",
+                "chart_title":"",
+                "chart_type":"",
+                "business_area":"",
+                "metric":"",
+                "summary":"",
+                "confidence":0.0
+            }
+        ]
+    }
+
+    Rules
+
+    - One object per chart.
+    - Do not analyse numerical values.
+    - Do not analyse X axis.
+    - Do not analyse legends.
+    - Do not guess.
+    - Return JSON only.
+    """
+
+        response = self.client.chat.completions.create(
+
+            model="gpt-4.1",
+
+            response_format={"type":"json_object"},
+
+            messages=[
+
+                {
+
+                    "role":"user",
+
+                    "content":[
+
+                        {
+                            "type":"text",
+                            "text":prompt
+                        },
+
+                        {
+
+                            "type":"image_url",
+
+                            "image_url":{
+
+                                "url":f"data:image/png;base64,{base64_image}"
+
+                            }
+
+                        }
+
+                    ]
+
+                }
+
+            ]
+
+        )
+
+        return json.loads(
+            response.choices[0].message.content
+        )
+
     def understand_chart(self, image_path):
 
         base64_image = self.encode_image(image_path)
@@ -125,69 +205,54 @@ class ChartUnderstandingAgent:
 
             try:
 
-                understanding = self.understand_chart(
+                understanding = self.understand_page(
                     chart["image"]
                 )
 
-                st.image(chart["image"], caption="Image sent to GPT")
-                print("=" * 80)
-                print("GPT RESPONSE")
-                print(understanding)
-                print("=" * 80)
+                # ---------------------------------------------------
+# Match the current chart with AI page analysis
+# ---------------------------------------------------
 
-                st.write("AI Understanding", understanding)
+                matched_chart = None
 
-                chart["chart_type"] = understanding.get(
+                for item in page_understanding["charts"]:
+
+                    if item["chart_id"] == chart["chart_id"]:
+
+                        matched_chart = item
+
+                        break
+
+                if matched_chart is None:
+
+                    matched_chart = {}
+
+                chart["chart_type"] = matched_chart.get(
                     "chart_type",
                     ""
                 )
 
-                chart["chart_title"] = understanding.get(
+                chart["chart_title"] = matched_chart.get(
                     "chart_title",
                     ""
                 )
 
-                chart["business_area"] = understanding.get(
+                chart["business_area"] = matched_chart.get(
                     "business_area",
                     ""
                 )
 
-                chart["metric"] = understanding.get(
+                chart["metric"] = matched_chart.get(
                     "metric",
                     ""
                 )
 
-                chart["x_axis"] = understanding.get(
-                    "x_axis",
-                    ""
-                )
-
-                chart["left_y_axis"] = understanding.get(
-                    "left_y_axis",
-                    ""
-                )
-
-                chart["right_y_axis"] = understanding.get(
-                    "right_y_axis",
-                    ""
-                )
-
-                chart["legend"] = understanding.get(
-                    "legend",
-                    []
-                )
-
-                chart["summary"] = understanding.get(
+                chart["summary"] = matched_chart.get(
                     "summary",
                     ""
                 )
 
-                chart["missing_information"] = understanding.get(
-                    "missing_information",
-                    []
-                )
-
-                chart["confidence"] = understanding.get(
+                chart["confidence"] = matched_chart.get(
                     "confidence",
                     0.0
                 )
