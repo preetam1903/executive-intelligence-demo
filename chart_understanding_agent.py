@@ -259,6 +259,11 @@ class ChartUnderstandingAgent:
 
             except Exception as e:
 
+                st.error(str(e))
+                print(e)
+
+                    
+
                 chart["chart_type"] = "Unknown"
 
                 chart["chart_title"] = "Analysis Failed"
