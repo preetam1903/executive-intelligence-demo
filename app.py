@@ -149,6 +149,28 @@ if uploaded_pdf is not None:
                 use_container_width=True
             )
 
+            st.divider()
+
+            st.subheader("🤖 Ask Executive")
+
+            question = st.text_input(
+                "Ask a question",
+                placeholder="Example: Explain this chart"
+            )
+
+            if st.button("Ask Executive"):
+
+                from executive_qa_agent import ExecutiveQAAgent
+
+                qa_agent = ExecutiveQAAgent()
+
+                answer = qa_agent.process(
+                    result["repository"],
+                    question
+                )
+
+                st.success(answer["answer"])
+
         st.write(layout)
 
   
