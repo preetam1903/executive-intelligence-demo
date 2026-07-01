@@ -178,7 +178,82 @@ if uploaded_pdf is not None:
                 preview,
                 use_container_width=True
             )
+            st.divider()
 
+            if st.button(
+                "🧠 Build Executive Knowledge Repository",
+                use_container_width=True
+            ):
+                st.session_state["run_detailed_analysis"] = True
+                
+            if st.session_state.get("run_detailed_analysis", False):
+
+                st.success("🧠 Building Executive Knowledge Repository...")
+
+                understanding_agent = ChartUnderstandingAgent()
+
+                detailed_results = []
+
+                for chart in result["repository"]["charts"]:
+
+                    with st.spinner(f"Analysing {chart['chart_title']}..."):
+
+                        detailed = understanding_agent.understand_detailed_chart(
+                            chart["image"]
+                        )
+
+                        detailed_results.append(detailed)
+
+                st.session_state["detailed_results"] = detailed_results
+            if "detailed_results" in st.session_state:
+
+                st.divider()
+
+                st.subheader("🧠 Detailed Chart Analysis")
+
+                for analysis in st.session_state["detailed_results"]:
+
+                    st.markdown(f"## {analysis['chart_title']}")
+
+                    st.write("**Chart Type:**", analysis["chart_type"])
+
+                    st.write("**Functional Area:**", analysis["functional_area"])
+
+                    st.write("**Metric:**", analysis["metric"])
+
+                    st.write("**X Axis:**", analysis["x_axis"]["label"])
+
+                    st.write("**X Values:**", analysis["x_axis"]["values"])
+
+                    st.write("**Left Y Axis:**", analysis["left_y_axis"]["label"])
+
+                    st.write("**Right Y Axis:**", analysis["right_y_axis"]["label"])
+
+                    st.write("**Legend:**", ", ".join(analysis["legend"]))
+
+                    st.write("**Series:**")
+
+                    for series in analysis["series"]:
+
+                        st.write(
+                            f"- {series['name']} : {series['values']}"
+                        )
+
+                    st.info(
+                        analysis["executive_insight"]
+                    )
+
+                    st.success(
+                        f"Confidence : {analysis['confidence']*100:.0f}%"
+                    )
+
+                    st.divider()
+
+
+
+
+                
+####################
             st.divider()
 
         st.subheader("🤖 Ask Executive")
