@@ -52,6 +52,31 @@ class ChartUnderstandingAgent:
 
     Identify every chart on the page.
 
+    For each chart determine:
+
+    1. Functional Area
+       Examples:
+       - Production
+       - Inventory
+       - Quality
+       - Logistics
+       - Maintenance
+       - Energy
+       - Finance
+       - Safety
+
+2. Chart Title
+
+3. Chart Type
+
+4. Primary Metric
+
+5. Executive Summary
+
+6. Confidence
+
+Return the Functional Area in the field "business_area".
+
     Return ONLY valid JSON.
 
     {

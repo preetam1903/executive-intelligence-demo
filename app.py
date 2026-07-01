@@ -85,18 +85,15 @@ if uploaded_pdf is not None:
 
         rows.append({
 
-            "Chart": chart["chart_id"],
+            "Functional Area": chart["business_area"],
+
+            "Chart": chart["chart_title"],
 
             "Chart Type": chart["chart_type"],
 
-            "Title": chart["chart_title"],
-            "X Axis": "Pending",
-            "Left Y": "Pending",
-            "Legend": "Pending",
+            "Metric": chart["metric"],
 
-            "Summary": chart["summary"],
-
-            "Missing": "None",
+            "Executive Summary": chart["summary"],
 
             "AI Confidence": f"{chart['confidence']*100:.0f}%"
 
