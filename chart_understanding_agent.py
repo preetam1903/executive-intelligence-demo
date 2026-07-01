@@ -1,3 +1,4 @@
+understanding
 """
 =========================================================
 Executive Intelligence Copilot
@@ -205,7 +206,7 @@ class ChartUnderstandingAgent:
 
             try:
 
-                understanding = self.understand_page(
+                page_understanding = self.understand_page(
                     chart["image"]
                 )
 
