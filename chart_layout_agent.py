@@ -60,7 +60,7 @@ class ChartLayoutStudio:
                 step=5
             )
 
-        st.button(
+        preview=st.button(
             "Preview Crop",
             type="primary"
         )
@@ -70,6 +70,7 @@ class ChartLayoutStudio:
             "top": top,
             "bottom": bottom,
             "left": left,
-            "right": right
+            "right": right,
+            "preview": preview
 
         }

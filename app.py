@@ -128,6 +128,25 @@ if uploaded_pdf is not None:
         layout_studio = ChartLayoutStudio()
     
         layout = layout_studio.show(selected_chart)
+        from chart_crop_agent import ChartCropAgent
+
+        if layout["preview"]:
+
+            crop_agent = ChartCropAgent()
+
+            preview = crop_agent.preview_crop(
+                selected_chart["image"],
+                layout
+            )
+
+            st.divider()
+
+            st.subheader("Crop Preview")
+
+            st.image(
+                preview,
+                use_container_width=True
+            )
 
         st.write(layout)
 

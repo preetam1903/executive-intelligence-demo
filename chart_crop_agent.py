@@ -19,6 +19,7 @@ Crop individual charts using grid/layout information.
 
 import os
 import fitz
+from PIL import Image
 
 
 class ChartCropAgent:
@@ -69,3 +70,30 @@ class ChartCropAgent:
         document.close()
 
         return charts
+    
+
+
+    def preview_crop(self, image_path, layout):
+        """
+        Preview crop using saved page image.
+        """
+
+        image = Image.open(image_path)
+
+        crop = image.crop(
+            (
+                layout["left"],
+                layout["top"],
+                layout["right"],
+                layout["bottom"]
+            )
+        )
+
+        preview_path = os.path.join(
+            self.output_folder,
+            "preview_crop.png"
+        )
+
+        crop.save(preview_path)
+
+        return preview_path
