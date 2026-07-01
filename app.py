@@ -93,6 +93,7 @@ if uploaded_pdf is not None:
     )
 
     selected_chart = chart_options[selected_chart_name]
+    st.write(selected_chart)
 
     st.divider()
 
