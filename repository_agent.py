@@ -57,6 +57,8 @@ class RepositoryAgent:
 
                 "position": chart["position"],
 
+                "image": chart.get("image"),
+
                 "chart_title": chart["chart_title"],
 
                 "chart_type": chart["chart_type"],
