@@ -1,7 +1,7 @@
 import streamlit as st
 
 from pipeline import run_pipeline
-from chart_layout_studio import ChartLayoutStudio
+from chart_layout_agent import ChartLayoutStudio
 
 # --------------------------------------------------
 # Streamlit Page Configuration
