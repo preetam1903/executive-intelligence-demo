@@ -1,4 +1,4 @@
-understanding
+
 """
 =========================================================
 Executive Intelligence Copilot
