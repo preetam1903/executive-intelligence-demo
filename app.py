@@ -99,7 +99,7 @@ if uploaded_pdf is not None:
 
             "Legend": "✅",
 
-            "Summary": "✅",
+            "Summary": chart["summary"],
 
             "Missing": "None",
 
@@ -114,14 +114,11 @@ if uploaded_pdf is not None:
 # --------------------------------------------------
 
     chart_options = {
-        f"{chart['chart_id']} - {chart['chart_title']}": chart
+        chart["chart_title"]: chart
         for chart in result["repository"]["charts"]
     }
 
-    selected_chart_name = st.selectbox(
-        "Select Chart for Detailed Analysis",
-        list(chart_options.keys())
-    )
+    
 
     selected_chart = chart_options[selected_chart_name]
 
@@ -137,6 +134,11 @@ if uploaded_pdf is not None:
 # ======================================================
 
     st.subheader("📈 Selected Chart")
+
+    selected_chart_name = st.selectbox(
+        "Select Chart for Detailed Analysis",
+        list(chart_options.keys())
+    )
 
     # Show image if available
     if "image" in selected_chart:
