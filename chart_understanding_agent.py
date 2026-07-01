@@ -128,6 +128,8 @@ class ChartUnderstandingAgent:
                 understanding = self.understand_chart(
                     chart["image"]
                 )
+
+                st.image(chart["image"], caption="Image sent to GPT")
                 print("=" * 80)
                 print("GPT RESPONSE")
                 print(understanding)
