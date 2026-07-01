@@ -200,93 +200,54 @@ class ChartUnderstandingAgent:
 
     def process(self, charts):
 
-        understood_charts = []
+        if len(charts) == 0:
+            return charts
 
-        for chart in charts:
+    # ----------------------------------------
+    # Analyse the PAGE only once
+    # ----------------------------------------
 
-            try:
+        page_understanding = self.understand_page(
+            charts[0]["image"]
+        )
 
-                page_understanding = self.understand_page(
-                    chart["image"]
-                )
+        ai_charts = page_understanding.get("charts", [])
 
-                # ---------------------------------------------------
-# Match the current chart with AI page analysis
-# ---------------------------------------------------
+    # ----------------------------------------
+    # Copy AI results into inventory
+    # by position (CH001 = first chart, etc.)
+    # ----------------------------------------
 
-                matched_chart = None
+        for chart, ai_chart in zip(charts, ai_charts):
 
-                for item in page_understanding["charts"]:
+            chart["chart_type"] = ai_chart.get(
+                "chart_type",
+                ""
+            )
 
-                    if item["chart_id"] == chart["chart_id"]:
+            chart["chart_title"] = ai_chart.get(
+                "chart_title",
+                ""
+            )
 
-                        matched_chart = item
+            chart["business_area"] = ai_chart.get(
+                "business_area",
+                ""
+            )
 
-                        break
+            chart["metric"] = ai_chart.get(
+                "metric",
+                ""
+            )
 
-                if matched_chart is None:
+            chart["summary"] = ai_chart.get(
+                "summary",
+                ""
+            )
 
-                    matched_chart = {}
+            chart["confidence"] = ai_chart.get(
+                "confidence",
+                0.0
+            )
 
-                chart["chart_type"] = matched_chart.get(
-                    "chart_type",
-                    ""
-                )
-
-                chart["chart_title"] = matched_chart.get(
-                    "chart_title",
-                    ""
-                )
-
-                chart["business_area"] = matched_chart.get(
-                    "business_area",
-                    ""
-                )
-
-                chart["metric"] = matched_chart.get(
-                    "metric",
-                    ""
-                )
-
-                chart["summary"] = matched_chart.get(
-                    "summary",
-                    ""
-                )
-
-                chart["confidence"] = matched_chart.get(
-                    "confidence",
-                    0.0
-                )
-
-            except Exception as e:
-
-                st.error(str(e))
-                print(e)
-
-                    
-
-                chart["chart_type"] = "Unknown"
-
-                chart["chart_title"] = "Analysis Failed"
-
-                chart["business_area"] = ""
-
-                chart["metric"] = ""
-
-                chart["x_axis"] = ""
-
-                chart["left_y_axis"] = ""
-
-                chart["right_y_axis"] = ""
-
-                chart["legend"] = []
-
-                chart["summary"] = str(e)
-
-                chart["missing_information"] = ["AI Analysis Failed"]
-
-                chart["confidence"] = 0.0
-
-            understood_charts.append(chart)
-
-        return understood_charts
+        return charts
