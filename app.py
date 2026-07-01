@@ -89,15 +89,10 @@ if uploaded_pdf is not None:
 
             "Chart Type": chart["chart_type"],
 
-            "Title": "✅",
-
-            "X Axis": "✅",
-
-            "Left Y": "✅",
-
-            "Right Y": "—",
-
-            "Legend": "✅",
+            "Title": chart["chart_title"],
+            "X Axis": "Pending",
+            "Left Y": "Pending",
+            "Legend": "Pending",
 
             "Summary": chart["summary"],
 
@@ -120,7 +115,7 @@ if uploaded_pdf is not None:
 
     
 
-    selected_chart = chart_options[selected_chart_name]
+    
 
     st.dataframe(
         summary_df,
@@ -139,6 +134,7 @@ if uploaded_pdf is not None:
         "Select Chart for Detailed Analysis",
         list(chart_options.keys())
     )
+    selected_chart = chart_options[selected_chart_name]
 
     # Show image if available
     if "image" in selected_chart:
