@@ -125,11 +125,11 @@ if uploaded_pdf is not None:
 
     selected_chart = chart_options[selected_chart_name]
 
-        st.dataframe(
-            summary_df,
-            use_container_width=True,
-            hide_index=True
-        )
+    st.dataframe(
+        summary_df,
+        use_container_width=True,
+        hide_index=True
+    )
 
     
 # ======================================================
