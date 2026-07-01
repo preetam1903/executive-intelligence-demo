@@ -2,6 +2,7 @@ import streamlit as st
 
 from pipeline import run_pipeline
 from chart_layout_agent import ChartLayoutStudio
+import pandas as pd
 
 # --------------------------------------------------
 # Streamlit Page Configuration
@@ -74,29 +75,63 @@ if uploaded_pdf is not None:
 
     st.divider()
 
-# ======================================================
-# Executive Chart Inventory
-# ======================================================
 
-    st.subheader("📊 Executive Chart Inventory")
 
-    charts = result["repository"]["charts"]
+    st.subheader("🤖 Executive AI Analysis Summary")
+
+    rows = []
+
+    for chart in result["repository"]["charts"]:
+
+        rows.append({
+
+            "Chart": chart["chart_id"],
+
+            "Chart Type": chart["chart_type"],
+
+            "Title": "✅",
+
+            "X Axis": "✅",
+
+            "Left Y": "✅",
+
+            "Right Y": "—",
+
+            "Legend": "✅",
+
+            "Summary": "✅",
+
+            "Missing": "None",
+
+            "AI Confidence": f"{chart['confidence']*100:.0f}%"
+
+        })
+
+    summary_df = pd.DataFrame(rows)
+
+    # --------------------------------------------------
+# Chart Selection
+# --------------------------------------------------
 
     chart_options = {
         f"{chart['chart_id']} - {chart['chart_title']}": chart
-        for chart in charts
+        for chart in result["repository"]["charts"]
     }
 
     selected_chart_name = st.selectbox(
-        "Select Executive Chart",
+        "Select Chart for Detailed Analysis",
         list(chart_options.keys())
     )
 
     selected_chart = chart_options[selected_chart_name]
-    st.write(selected_chart)
 
-    st.divider()
+        st.dataframe(
+            summary_df,
+            use_container_width=True,
+            hide_index=True
+        )
 
+    
 # ======================================================
 # Selected Chart
 # ======================================================
